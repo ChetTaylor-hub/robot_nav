@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf2_ros
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -120,8 +121,9 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES my_robot_navigation
-#  CATKIN_DEPENDS cv_bridge geometry_msgs gmapping move_base nav_msgs rospy sensor_msgs std_msgs tf2_ros
+ CATKIN_DEPENDS cv_bridge geometry_msgs gmapping move_base nav_msgs rospy sensor_msgs std_msgs tf2_ros message_runtime
 #  DEPENDS system_lib
+  
 )
 
 ###########
@@ -178,10 +180,10 @@ include_directories(
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-# catkin_install_python(PROGRAMS
-#   scripts/cv_bridge_test.py scripts/face_detector.py scripts/motion_detector.py
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+catkin_install_python(PROGRAMS
+  scripts/main.py scripts/yolov5_detector.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
