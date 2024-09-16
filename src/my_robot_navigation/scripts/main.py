@@ -30,10 +30,15 @@ class RobotNavigation:
         cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         results = self.model(cv_image)
         for *box, conf, cls in results.xyxy[0]:
-            if int(cls) == 0:  # Assuming the target is class 0 (person)
-                self.target_detected = True
-                self.target_position = self.calculate_target_position(box)
-                break
+            # 绘制边界框
+            cv2.rectangle(cv_image, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 255, 0), 2)
+            # 显示类别和置信度
+            cv2.putText(cv_image, f'{int(cls)}: {conf:.2f}', (int(box[0]), int(box[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            cv2.imshow('YOLOv5', cv_image)
+            # if int(cls) == 0:  # Assuming the target is class 0 (person)
+            #     self.target_detected = True
+            #     self.target_position = self.calculate_target_position(box)
+            #     break
 
     def laser_callback(self, data):
         # Check if there are obstacles within 0.5 meters in front of the robot
@@ -63,7 +68,15 @@ class RobotNavigation:
         # Generate random target position within a certain range
         random_position = (random.uniform(-mapExtent["width"]/2, mapExtent["width"]/2),
                            random.uniform(-mapExtent["height"]/2, mapExtent["height"]/2))
-        self.move_to_target(random_position)
+        
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = "map"
+        goal.target_pose.header.stamp = rospy.Time.now()
+        goal.target_pose.pose.position.x = random_position[0]
+        goal.target_pose.pose.position.y = random_position[1]
+        goal.target_pose.pose.orientation.w = 1.0
+        self.move_base_client.send_goal(goal)
+        self.move_base_client.wait_for_result(rospy.Duration(5))
 
     def run(self):
         rate = rospy.Rate(10)
