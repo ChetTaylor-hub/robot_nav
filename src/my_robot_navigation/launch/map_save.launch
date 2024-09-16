@@ -1,0 +1,5 @@
+<launch>
+    <!-- nav 文件夹可以不创建 -->
+    <arg name="filename" value="$(find my_robot_navigation)/map/nav" />
+    <node name="map_save" pkg="map_server" type="map_saver" args="-f $(arg filename)" />
+</launch>

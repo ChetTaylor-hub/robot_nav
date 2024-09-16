@@ -1,0 +1,9 @@
+<launch>
+  <!-- 启动导航功能包 -->
+  <include file="$(find my_robot_navigation)/launch/slam_gmapping.launch" />
+  <include file="$(find my_robot_navigation)/launch/move_base_slam.launch" />
+
+  <!-- 启动 YOLOv5 目标检测节点 -->
+  <node pkg="my_robot_navigation" type="yolo_object_detection.py" name="yolo_object_detection"
+    output="screen" />
+</launch>

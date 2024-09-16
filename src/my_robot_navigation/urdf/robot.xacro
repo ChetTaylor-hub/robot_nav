@@ -1,0 +1,8 @@
+<!-- 组合惯性矩阵文件、小车、摄像头和雷达 -->
+<robot name="robot" xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="xacro/inertial.xacro" />
+  <xacro:include filename="xacro/base_wheel.xacro" />
+  <xacro:include filename="xacro/camera.xacro" />
+  <xacro:include filename="xacro/laser.xacro" />
+  <xacro:include filename="xacro/move.xacro" />
+</robot>
