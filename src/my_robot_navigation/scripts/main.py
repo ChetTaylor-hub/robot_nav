@@ -3,7 +3,7 @@ import rospy
 import random
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image, LaserScan
-from std_msgs.msg import String
+from std_msgs.msg import Float32MultiArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
 import cv2
@@ -16,29 +16,25 @@ class RobotNavigation:
     def __init__(self):
         rospy.init_node('robot_navigation', anonymous=True)
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_raw', Image, self.image_callback)
+        # self.image_sub = rospy.Subscriber('/camera/image_raw', Image, self.image_callback)
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
+        self.target_sub = rospy.Subscriber('/yolov5/targets', Float32MultiArray, self.target_callback)
         self.bridge = CvBridge()
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+        # self.model = torch.hub.load("ultralytics/yolov5", "yolov5s")  # or yolov5n - yolov5x6, custom
         self.move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move_base_client.wait_for_server()
         self.target_detected = False
         self.target_position = None
         self.obstacle_detected = False
 
-    def image_callback(self, data):
-        cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        results = self.model(cv_image)
-        for *box, conf, cls in results.xyxy[0]:
-            # 绘制边界框
-            cv2.rectangle(cv_image, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 255, 0), 2)
-            # 显示类别和置信度
-            cv2.putText(cv_image, f'{int(cls)}: {conf:.2f}', (int(box[0]), int(box[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            cv2.imshow('YOLOv5', cv_image)
-            # if int(cls) == 0:  # Assuming the target is class 0 (person)
-            #     self.target_detected = True
-            #     self.target_position = self.calculate_target_position(box)
-            #     break
+    # def image_callback(self, data):
+    #     cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+    #     results = self.model(cv_image)
+    #     for *box, conf, cls in results.xyxy[0]:
+    #         if int(cls) == 0:  # Assuming the target is class 0 (person)
+    #             self.target_detected = True
+    #             self.target_position = self.calculate_target_position(box)
+    #             break
 
     def laser_callback(self, data):
         # Check if there are obstacles within 0.5 meters in front of the robot
@@ -47,6 +43,10 @@ class RobotNavigation:
             self.obstacle_detected = True
         else:
             self.obstacle_detected = False
+
+    def target_callback(self, msg):
+        self.target_detected = True
+        self.target_position = (msg.data[0], msg.data[1])
 
     def calculate_target_position(self, box):
         # Placeholder for actual position calculation

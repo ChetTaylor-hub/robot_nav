@@ -58,6 +58,11 @@ find_package(catkin REQUIRED COMPONENTS
 #   Message1.msg
 #   Message2.msg
 # )
+add_message_files(
+  FILES
+  BoundingBox.msg
+  BoundingBoxes.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -78,6 +83,10 @@ find_package(catkin REQUIRED COMPONENTS
 #   DEPENDENCIES
 #   geometry_msgs#   nav_msgs#   sensor_msgs#   std_msgs
 # )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -167,6 +176,10 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 # catkin_install_python(PROGRAMS
 #   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
+# catkin_install_python(PROGRAMS
+#   scripts/cv_bridge_test.py scripts/face_detector.py scripts/motion_detector.py
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
