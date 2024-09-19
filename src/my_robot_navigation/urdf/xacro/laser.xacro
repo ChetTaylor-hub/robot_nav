@@ -40,6 +40,7 @@
         <material>Gazebo/White</material>
     </gazebo>
 
+
     <!-- 雷达属性 -->
     <xacro:property name="laser_length" value="0.05" /> <!-- 雷达长度 -->
     <xacro:property name="laser_radius" value="0.03" /> <!-- 雷达半径 -->

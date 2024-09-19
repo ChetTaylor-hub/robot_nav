@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Camera1
       Splitter Ratio: 0.5
     Tree Height: 396
   - Class: rviz/Selection
@@ -166,7 +167,7 @@ Visualization Manager:
     - Class: rviz/Camera
       Enabled: true
       Image Rendering: background and overlay
-      Image Topic: /camera/image_raw
+      Image Topic: /camera/rgb/image_raw
       Name: Camera
       Overlay Alpha: 0.5
       Queue Size: 2
@@ -348,7 +349,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 20.264240264892578
+      Distance: 19.74809455871582
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -356,17 +357,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -4.768495559692383
-        Y: 4.487505912780762
-        Z: -10.581670761108398
+        X: -6.130507469177246
+        Y: 4.579604625701904
+        Z: -9.706859588623047
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9147967100143433
+      Pitch: 0.9697966575622559
       Target Frame: <Fixed Frame>
-      Yaw: 5.628582000732422
+      Yaw: 5.778581142425537
     Saved: ~
 Window Geometry:
   Camera:

@@ -54,7 +54,7 @@ def image_cb(msg, cv_bridge, yolov5_param, color_classes, image_pub):
     # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/before_image.jpg", frame)
     rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/after_image.jpg", rgb_image)
-    results = yolov5_param.model(frame, size=640)
+    results = yolov5_param.model(rgb_image, size=320)
     boxs = results.pandas().xyxy[0].values
     for box in boxs:
         bounding_box = BoundingBox()
@@ -105,7 +105,7 @@ def main():
     color_classes = {}
     image_pub = rospy.Publisher("/yolov5/detection_image", Image, queue_size=1)
     bind_image_cb = partial(image_cb, cv_bridge=bridge, yolov5_param=yolov5_param, color_classes=color_classes, image_pub=image_pub)
-    rospy.Subscriber("/camera/image_raw", Image, bind_image_cb)
+    rospy.Subscriber("/camera/rgb/image_raw", Image, bind_image_cb)
    
     rospy.spin()
     cv2.destroyAllWindows()

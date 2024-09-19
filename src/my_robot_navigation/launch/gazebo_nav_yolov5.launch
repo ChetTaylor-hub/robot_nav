@@ -5,7 +5,6 @@
     <!-- 启动 gazebo -->
 
     <!-- 加载仿真环境 -->
-    <!-- <include file="$(find gazebo_ros)/launch/empty_world.launch" /> -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(find my_robot_navigation)/worlds/test2.world"></arg>
     </include>
@@ -16,8 +15,8 @@
     <!-- 加载slam_gampping -->
     <include file="$(find my_robot_navigation)/launch/slam_gmapping.launch" />
 
-    <!-- 加载test2.py -->
-    <!-- <node pkg="my_robot_navigation" type="main.py" name="main" output="screen" /> -->
+    <!-- 加载main.py -->
+    <node pkg="my_robot_navigation" type="main.py" name="main" output="screen" />
 
     <!-- 加载yolov5_detector.launch -->
     <include file="$(find my_robot_navigation)/launch/yolov5_detector.launch" />

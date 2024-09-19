@@ -9,6 +9,10 @@
     <node
         name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
+    <node pkg="tf2_ros" type="static_transform_publisher" name="static_transform_publisher"
+        args="0 0 0 -1.57 0 -1.57 /support /support_depth" />
+
+
     <!-- 启动move.launch -->
     <include file="$(find my_robot_navigation)/launch/move.launch" />
 </launch>
