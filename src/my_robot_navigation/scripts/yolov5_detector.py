@@ -21,16 +21,16 @@ class Yolov5Param:
         # 指定yolov5的权重文件路径，位于robot_vision/data/weights/yolov5s.pt
         weight_path = rospy.get_param('~weight_path', '')
         # yolov5的某个参数，这里不深究了
-        conf = rospy.get_param('~conf', '0.5')
+        conf = float(rospy.get_param('~conf', ''))
         # 使用pytorch加载yolov5模型，torch.hub.load会从robot_vision/yolov5/中找名为hubconf.py的文件
         # hubconf.py文件包含了模型的加载代码，负责指定加载哪个模型
-        self.model = torch.hub.load(yolov5_path, 'custom', path=weight_path, source='local')
+        self.model = torch.hub.load("ultralytics/yolov5", "yolov5s")
         # 一个参数，用来决定使用cpu还是gpu，这里我们使用gpu
         if (rospy.get_param('/use_cpu', 'false')):
             self.model.cpu()
         else:
             self.model.cuda()
-        self.model.conf = conf
+        self.model.conf = 0.25
 
         # target publishers
         # BoundingBoxes是本样例自定义的消息类型，用来记录识别到的目标
@@ -51,8 +51,10 @@ def image_cb(msg, cv_bridge, yolov5_param, color_classes, image_pub):
     bounding_boxes.header = msg.header
 
     # 将BGR图像转换为RGB图像, 给yolov5，其返回识别到的目标信息
+    # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/before_image.jpg", frame)
     rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    results = yolov5_param.model(rgb_image)
+    # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/after_image.jpg", rgb_image)
+    results = yolov5_param.model(frame, size=640)
     boxs = results.pandas().xyxy[0].values
     for box in boxs:
         bounding_box = BoundingBox()

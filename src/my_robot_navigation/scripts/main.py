@@ -11,7 +11,7 @@ from cv_bridge import CvBridge
 import torch
 from my_robot_navigation.msg import BoundingBoxes, BoundingBox
 
-mapExtent = {"width": 8, "height": 8}
+mapExtent = {"width": 5, "height": 5}
 
 class RobotNavigation:
     def __init__(self):

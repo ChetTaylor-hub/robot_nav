@@ -30,6 +30,11 @@ __pycache__/
 # model file
 *.pt
 
+# image
+*.jpg
+*.png
+
 # other
 *.gv
 .vscode/
+
