@@ -81,6 +81,9 @@ class RobotNavigation:
             target_camera_frame.pose.position.z = Z
             target_camera_frame.pose.orientation.w = 1.0
 
+            # 等待转换可用
+            self.tf_listener.waitForTransform("camera", "map", rospy.Time(), rospy.Duration(4.0))
+
             # 将目标坐标转换为地图坐标系
             target_map_frame = self.tf_listener.transformPose("map", target_camera_frame)
             self.target_position = (target_map_frame.pose.position.x, target_map_frame.pose.position.y)
