@@ -13,8 +13,12 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image, RegionOfInterest
 from my_robot_navigation.msg import BoundingBox, BoundingBoxes
 
+
 class Yolov5Param:
     def __init__(self):
+        # filter class
+        self.cls = ["car"]
+
         # load local repository(YoloV5:v6.0)
         # 指定yolov5的源码路径，位于robot_vision/yolov5/
         yolov5_path = rospy.get_param('/yolov5_path', '')
@@ -37,26 +41,41 @@ class Yolov5Param:
         # 使用/yolov5/targets topic发布出去
         self.target_pub = rospy.Publisher("/yolov5/targets",  BoundingBoxes, queue_size=1)
 
+
+    def fiter_class(self, fiter: list):
+        cls = {"person": 0, "bicycle": 1, "car": 2, "motorcycle": 3, "airplane": 4, "bus": 5, "train": 6, "truck": 7, "boat": 8, "traffic light": 9, "fire hydrant": 10, "stop sign": 11, "parking meter": 12, "bench": 13, "bird": 14, "cat": 15, "dog": 16, "horse": 17, "sheep": 18, "cow": 19, "elephant": 20, "bear": 21, "zebra": 22, "giraffe": 23, "backpack": 24, "umbrella": 25, "handbag": 26, "tie": 27, "suitcase": 28, "frisbee": 29, "skis": 30, "snowboard": 31, "sports ball": 32, "kite": 33, "baseball bat": 34, "baseball glove": 35, "skateboard": 36, "surfboard": 37, "tennis racket": 38, "bottle": 39, "wine glass": 40, "cup": 41, "fork": 42, "knife": 43, "spoon": 44, "bowl": 45, "banana": 46, "apple": 47, "sandwich": 48, "orange": 49, "broccoli": 50, "carrot": 51, "hot dog": 52, "pizza": 53, "donut": 54, "cake": 55, "chair": 56, "couch": 57, "potted plant": 58, "bed": 59, "dining table": 60, "toilet": 61, "tv": 62, "laptop": 63, "mouse": 64, "remote": 65, "keyboard": 66, "cell phone": 67, "microwave": 68, "oven": 69, "toaster": 70, "sink": 71, "refrigerator": 72, "book": 73, "clock":
+               74, "vase": 75, "scissors": 76, "teddy bear": 77, "hair drier": 78, "toothbrush": 79}
+        
+        # 从cls中删除不需要的类别
+        for key in cls.keys():
+            if key not in fiter:
+                del cls[key]
+        return cls
+
 def image_cb(msg, cv_bridge, yolov5_param, color_classes, image_pub):
-    # 使用cv_bridge将ROS的图像数据转换成OpenCV的图像格式
+    
     try:
-        # 将Opencv图像转换numpy数组形式，数据类型是uint8（0~255）
-        # numpy提供了大量的操作数组的函数，可以方便高效地进行图像处理    
+        # 使用cv_bridge将ROS的图像数据转换成OpenCV的图像格式，将Opencv图像转换numpy数组形式，数据类型是uint8（0~255）
         cv_image = cv_bridge.imgmsg_to_cv2(msg, "bgr8")
         frame = np.array(cv_image, dtype=np.uint8)
     except CvBridgeError as e:
         print(e)
+
     # 实例化BoundingBoxes，存储本次识别到的所有目标信息
     bounding_boxes = BoundingBoxes()
     bounding_boxes.header = msg.header
 
-    # 将BGR图像转换为RGB图像, 给yolov5，其返回识别到的目标信息
-    # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/before_image.jpg", frame)
+    # image size
+    img_size = 320
+
     rgb_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    # cv2.imwrite("/home/ohn/Desktop/robot_nav/src/my_robot_navigation/scripts/image/after_image.jpg", rgb_image)
-    results = yolov5_param.model(rgb_image, size=320)
+    results = yolov5_param.model(rgb_image, size=img_size)
     boxs = results.pandas().xyxy[0].values
+
     for box in boxs:
+        # 过滤掉不需要的类别
+        if box[-1] not in yolov5_param.cls:
+            continue
         bounding_box = BoundingBox()
         # 置信度，因为是基于统计，因此每个目标都有一个置信度，标识可能性
         bounding_box.probability =np.float64(box[4])
@@ -82,7 +101,7 @@ def image_cb(msg, cv_bridge, yolov5_param, color_classes, image_pub):
         # 用框把目标圈出来
         cv2.rectangle(cv_image, (int(box[0]), int(box[1])),
                         (int(box[2]), int(box[3])), (int(color[0]),int(color[1]), int(color[2])), 2)    
-		# 在框上, 打印物体类型信息Class
+        # 在框上, 打印物体类型信息Class
         if box[1] < 20:
             text_pos_y = box[1] + 30
         else:

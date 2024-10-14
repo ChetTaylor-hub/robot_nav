@@ -63,6 +63,8 @@ add_message_files(
   FILES
   BoundingBox.msg
   BoundingBoxes.msg
+  TargetWorldCoordinate.msg
+  TargetWorldCoordinates.msg
 )
 
 ## Generate services in the 'srv' folder

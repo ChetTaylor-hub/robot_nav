@@ -9,7 +9,7 @@ import actionlib
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import torch
-from my_robot_navigation.msg import BoundingBoxes, BoundingBox
+from my_robot_navigation.msg import TargetWorldCoordinates
 import tf
 
 mapExtent = {"width": 5, "height": 5}
@@ -19,7 +19,7 @@ class RobotNavigation:
         rospy.init_node('robot_navigation', anonymous=True)
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
-        self.target_sub = rospy.Subscriber('/yolov5/targets', BoundingBoxes, self.target_callback)
+        self.target_sub = rospy.Subscriber('/yolov5/world_coordinates', BoundingBoxes, self.target_callback)
         self.bridge = CvBridge()
         self.move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move_base_client.wait_for_server()
@@ -29,7 +29,7 @@ class RobotNavigation:
         self.depth_image = None
         self.camera_info = None
         self.target_detected = False
-        self.target_position = None
+        self.target_position = []
 
     def laser_callback(self, data):
         # Check if there are obstacles within 0.5 meters in front of the robot
@@ -50,46 +50,13 @@ class RobotNavigation:
         self.camera_info = msg
 
     def target_callback(self, msg):
-        if self.depth_image is None or self.camera_info is None:
-            return
-
-        try:
-            target = msg.bounding_boxes[0]
-            # 获取目标的二维坐标
-            x = (target.xmin + target.xmax) / 2
-            y = (target.ymin + target.ymax) / 2
-
-            # 获取深度值
-            depth = self.depth_image[int(y), int(x)]
-
-            # 将二维坐标和深度值转换为三维坐标
-            fx = self.camera_info.K[0]
-            fy = self.camera_info.K[4]
-            cx = self.camera_info.K[2]
-            cy = self.camera_info.K[5]
-
-            X = (x - cx) * depth / fx
-            Y = (y - cy) * depth / fy
-            Z = depth
-
-            # 创建目标的三维坐标
-            target_camera_frame = PoseStamped()
-            target_camera_frame.header.frame_id = "camera"
-            target_camera_frame.header.stamp = rospy.Time.now()
-            target_camera_frame.pose.position.x = X
-            target_camera_frame.pose.position.y = Y
-            target_camera_frame.pose.position.z = Z
-            target_camera_frame.pose.orientation.w = 1.0
-
-            # 等待转换可用
-            self.tf_listener.waitForTransform("camera", "map", rospy.Time(), rospy.Duration(4.0))
-
-            # 将目标坐标转换为地图坐标系
-            target_map_frame = self.tf_listener.transformPose("map", target_camera_frame)
-            self.target_position = (target_map_frame.pose.position.x, target_map_frame.pose.position.y)
+        # 先将目标坐标存上
+        for box in msg.bounding_boxes:
+            x_center = (box.xmin + box.xmax) / 2
+            y_center = (box.ymin + box.ymax) / 2
+            cls = box.Class
+            self.target_position.append((x_center, y_center))
             self.target_detected = True
-        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
-            rospy.logerr("TF Exception: %s", e)
 
     def move_to_target(self, position):
         goal = MoveBaseGoal()
@@ -113,7 +80,7 @@ class RobotNavigation:
         goal.target_pose.pose.position.y = random_position[1]
         goal.target_pose.pose.orientation.w = 1.0
         self.move_base_client.send_goal(goal)
-        self.move_base_client.wait_for_result(rospy.Duration(5))
+        self.move_base_client.wait_for_result()
 
     def run(self):
         rate = rospy.Rate(10)
