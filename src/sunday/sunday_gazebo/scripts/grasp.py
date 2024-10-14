@@ -26,7 +26,7 @@ class graspDemo:
         self.arm = moveit_commander.move_group.MoveGroupCommander("manipulator")
         self.end_effector_link = self.arm.get_end_effector_link()
         # 设置容忍误差
-        self.arm.set_goal_position_tolerance(0.01)
+        self.arm.set_goal_position_tolerance(0.001)
         self.arm.set_goal_orientation_tolerance(0.05)
         self.arm.allow_replanning(True)
         self.arm.set_pose_reference_frame(self.reference_frame)
@@ -125,7 +125,7 @@ class graspDemo:
         # pos.orientation.w = preState['down'][3]
         waypoints.append(pos)
         fraction = 0.0 
-        maxtries = 300
+        maxtries = 100
         attempts = 0
         self.arm.set_pose_reference_frame(self.reference_frame)
         self.arm.set_start_state_to_current_state()
@@ -134,14 +134,15 @@ class graspDemo:
             # def compute_cartesian_path(
             #     self,
             #     waypoints,
-            #     eef_step,
+            #     eef_step,                                 
             #     avoid_collisions=True,
             #     path_constraints=None,
             # ):
             (plan, fraction) = self.arm.compute_cartesian_path (
                                     waypoints,   # waypoint poses，路点列表
-                                    0.01,        # eef_step，终端步进值
-                                    False)        # avoid_collisions，避障规划
+                                    0.1,        # eef_step，终端步进值
+                                    0.0,         # jump_threshold，跳跃阈值
+                                    True)        # avoid_collisions，避障规划
             attempts += 1
             
         if fraction == 1.0:
