@@ -1,0 +1,40 @@
+# ROS build and development files
+build/
+devel/
+install/
+
+*.catkin_workspace
+
+# Log files
+log/
+*.log
+
+# ROS specific files
+*.bag
+*.pyc
+*.swp
+*.bak
+
+# Catkin workspace files
+.cproject
+.project
+.settings/
+
+# Python virtual environment
+venv/
+__pycache__/
+
+# Miscellaneous
+*.DS_Store
+
+# model file
+*.pt
+
+# image
+*.jpg
+*.png
+
+# other
+*.gv
+.vscode/
+
