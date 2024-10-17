@@ -49,7 +49,7 @@ class graspDemo:
         target_pose.pose.orientation.z = orientation[2]
         target_pose.pose.orientation.w = orientation[3]
         # 设置当前坐标为起始坐标
-        self.arm.set_start_state_to_current_state()
+        # self.arm.set_start_state_to_current_state()
         # 设置位置目标
         self.arm.set_pose_target(target_pose, self.end_effector_link)
         self.arm.go(wait=True)
@@ -100,7 +100,6 @@ class graspDemo:
             (plan, fraction) = self.arm.compute_cartesian_path (
                                     waypoints,   # waypoint poses，路点列表
                                     0.1,        # eef_step，终端步进值
-                                    0.0,         # jump_threshold，跳跃阈值
                                     True)        # avoid_collisions，避障规划
             attempts += 1
             
@@ -141,7 +140,6 @@ class graspDemo:
             (plan, fraction) = self.arm.compute_cartesian_path (
                                     waypoints,   # waypoint poses，路点列表
                                     0.1,        # eef_step，终端步进值
-                                    0.0,         # jump_threshold，跳跃阈值
                                     True)        # avoid_collisions，避障规划
             attempts += 1
             
@@ -202,7 +200,7 @@ def get_RT_matrix(base_frame, reference_frame):
     R[1].append(0)
     R[2].append(0)
     R.append([0.0,0.0,0.0,1.0])
-    R = np.mat(R) 
+    R = np.mat(R)
     return [R,T]
 
 def coordinate_transform(cameraFrame_pos, R, T):
@@ -217,15 +215,20 @@ def coordinate_transform(cameraFrame_pos, R, T):
 findObject = False
 depthImg = np.array(0)
 depthOK = False
+objectClass = ["cube", "trangle", "star"]
 
 def BoundingBoxCallBack(data):
     # yolo检测的回调函数
-    global findObject, u, v, graspObject
+    global findObject, u, v, graspObject, objectClass
 
     if not findObject:
         # 待抓取目标为空，则请求输入抓取目标
         if graspObject == '':
-            graspObject = input('object detected, please input the object you want to grasp:(cube, trangle, star)\n')
+            graspObject = input(f'object detected, please input the object you want to grasp:{objectClass}\n')
+            if graspObject not in objectClass:
+                rospy.loginfo('The object you want to grasp is not support!!!')
+                graspObject = ''
+                return
         objectGrasp = []
         for dat in data.bounding_boxes:
             # 遍历所有目标，种类与待抓取目标相同则保存目标中心位置
