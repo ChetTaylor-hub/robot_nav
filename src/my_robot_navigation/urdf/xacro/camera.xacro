@@ -11,7 +11,7 @@
     <xacro:property
         name="camera_y" value="0.0" /> <!-- 摄像头安装的y坐标 -->
     <xacro:property name="camera_z"
-        value="${base_link_length / 2 + camera_height / 2}" /> <!--
+        value="${base_wheel_link_length / 2 + camera_height / 2}" /> <!--
     摄像头安装的z坐标:底盘高度 / 2 + 摄像头高度 / 2  -->
     <xacro:property name="camera_m"
         value="0.01" /> <!-- 摄像头质量 -->
@@ -35,8 +35,8 @@
             h="${camera_height}" />
     </link>
 
-    <joint name="camera2base_link" type="fixed">
-        <parent link="base_link" />
+    <joint name="camera2base_wheel_link" type="fixed">
+        <parent link="base_wheel_link" />
         <child link="camera" />
         <origin xyz="${camera_x} ${camera_y} ${camera_z}" />
     </joint>

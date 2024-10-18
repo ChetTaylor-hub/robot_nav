@@ -8,25 +8,25 @@
         <color rgba="0.0 0.0 0.0 1.0" />
     </material>
     <!-- 底盘属性 -->
-    <xacro:property name="base_footprint_radius" value="0.001" /> <!-- base_footprint 半径  -->
-    <xacro:property name="base_link_radius" value="0.1" /> <!-- base_link 半径 -->
-    <xacro:property name="base_link_length" value="0.08" /> <!-- base_link 长 -->
+    <xacro:property name="base_wheel_footprint_radius" value="0.001" /> <!-- base_wheel_footprint 半径  -->
+    <xacro:property name="base_wheel_link_radius" value="0.1" /> <!-- base_wheel_link 半径 -->
+    <xacro:property name="base_wheel_link_length" value="0.08" /> <!-- base_wheel_link 长 -->
     <xacro:property name="earth_space" value="0.015" /> <!-- 离地间距 -->
-    <xacro:property name="base_link_m" value="0.5" /> <!-- 质量  -->
+    <xacro:property name="base_wheel_link_m" value="0.5" /> <!-- 质量  -->
 
     <!-- 底盘 -->
-    <link name="base_footprint">
+    <link name="base_wheel_footprint">
         <visual>
             <geometry>
-                <sphere radius="${base_footprint_radius}" />
+                <sphere radius="${base_wheel_footprint_radius}" />
             </geometry>
         </visual>
     </link>
 
-    <link name="base_link">
+    <link name="base_wheel_link">
         <visual>
             <geometry>
-                <cylinder radius="${base_link_radius}" length="${base_link_length}" />
+                <cylinder radius="${base_wheel_link_radius}" length="${base_wheel_link_length}" />
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="yellow">
@@ -36,23 +36,23 @@
         <!-- 与rviz不同（1）：gazebo的urdf或xacro文件中必须设置碰撞 -->
         <collision>
             <geometry>
-                <cylinder radius="${base_link_radius}" length="${base_link_length}" />
+                <cylinder radius="${base_wheel_link_radius}" length="${base_wheel_link_length}" />
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
         </collision>
         <!-- 与rviz不同（2）：使用在head.xacro中封装过的inertial标签 -->
-        <xacro:cylinder_inertial_matrix m="${base_link_m}" r="${base_link_radius}"
-            h="${base_link_length}" />
+        <xacro:cylinder_inertial_matrix m="${base_wheel_link_m}" r="${base_wheel_link_radius}"
+            h="${base_wheel_link_length}" />
     </link>
 
 
-    <joint name="base_link2base_footprint" type="fixed">
-        <parent link="base_footprint" />
-        <child link="base_link" />
-        <origin xyz="0 0 ${earth_space + base_link_length / 2 }" />
+    <joint name="base_wheel_link2base_wheel_footprint" type="fixed">
+        <parent link="base_wheel_footprint" />
+        <child link="base_wheel_link" />
+        <origin xyz="0 0 ${earth_space + base_wheel_link_length / 2 }" />
     </joint>
 
-    <gazebo reference="base_link">
+    <gazebo reference="base_wheel_link">
         <!-- 与rviz不同（3）：重新设置颜色 -->
         <material>Gazebo/Yellow</material>
     </gazebo>
@@ -82,11 +82,11 @@
             <xacro:cylinder_inertial_matrix m="${wheel_m}" r="${wheel_radius}" h="${wheel_length}" />
         </link>
 
-        <joint name="${name}_wheel2base_link" type="continuous">
-            <parent link="base_link" />
+        <joint name="${name}_wheel2base_wheel_link" type="continuous">
+            <parent link="base_wheel_link" />
             <child link="${name}_wheel" />
             <origin
-                xyz="0 ${flag * base_link_radius} ${-(earth_space + base_link_length / 2 - wheel_radius) }" />
+                xyz="0 ${flag * base_wheel_link_radius} ${-(earth_space + base_wheel_link_length / 2 - wheel_radius) }" />
             <axis xyz="0 1 0" />
         </joint>
 
@@ -122,11 +122,11 @@
             <xacro:sphere_inertial_matrix m="${support_wheel_m}" r="${support_wheel_radius}" />
         </link>
 
-        <joint name="${name}_wheel2base_link" type="continuous">
-            <parent link="base_link" />
+        <joint name="${name}_wheel2base_wheel_link" type="continuous">
+            <parent link="base_wheel_link" />
             <child link="${name}_wheel" />
             <origin
-                xyz="${flag * (base_link_radius - support_wheel_radius)} 0 ${-(base_link_length / 2 + earth_space / 2)}" />
+                xyz="${flag * (base_wheel_link_radius - support_wheel_radius)} 0 ${-(base_wheel_link_length / 2 + earth_space / 2)}" />
             <axis xyz="1 1 1" />
         </joint>
 
@@ -139,13 +139,14 @@
     <xacro:add_support_wheel name="back" flag="-1" />
 
     <!-- 包含sunday机械臂 -->
-    <xacro:include filename="path/to/sunday.xacro" />
+    <xacro:include filename="$(find sunday_description)/urdf/sunday.xacro" />
 
     <!-- 设置base_link和sunday之间的连接 -->
     <joint name="base_to_sunday" type="fixed">
-        <parent link="base_link" /> <!-- base_wheel的基链接 -->
-        <child link="base_footprint" /> <!-- sunday的基链接 -->
-        <origin xyz="0 0 ${base_link_length / 2}" rpy="0 0 0" /> <!-- 根据需要调整位置和姿态 -->
+        <parent link="base_wheel_link" /> <!-- base_wheel的基链接 -->
+        <child link="world" /> <!-- sunday的基链接 -->
+        <!-- TODO: 调整wheel和sunday的相对位置 -->
+        <origin xyz="0 0 ${base_wheel_link_length / 2}" rpy="0 0 0" /> <!-- 根据需要调整位置和姿态 -->
     </joint>
 
 

@@ -6,7 +6,7 @@
 
     <!-- 加载仿真环境 -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find my_robot_navigation)/worlds/test.world"></arg>
+        <arg name="world_name" value="$(find my_robot_navigation)/worlds/box_house.world"></arg>
     </include>
 
     <!-- 加载rviz.launch -->
@@ -16,10 +16,10 @@
     <include file="$(find my_robot_navigation)/launch/slam_gmapping.launch" />
 
     <!-- 加载robot_nav.py -->
-    <node pkg="my_robot_navigation" type="robot_nav.py" name="robot_nav" output="screen" />
+    <!-- <node pkg="my_robot_navigation" type="robot_nav.py" name="robot_nav" output="screen" /> -->
 
     <!-- 加载yolov5_detector.launch -->
-    <include file="$(find Yolov5_ros)/launch/yolo_v5.launch" />
+    <!-- <include file="$(find Yolov5_ros)/launch/yolo_v5.launch" /> -->
 
     <!-- 在 gazebo 中显示机器人模型 -->
     <node pkg="gazebo_ros" type="spawn_model" name="model"

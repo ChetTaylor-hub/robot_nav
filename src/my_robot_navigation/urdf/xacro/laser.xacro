@@ -5,7 +5,7 @@
     <xacro:property name="support_radius" value="0.01" /> <!-- 支架半径 -->
     <xacro:property name="support_x" value="0.0" /> <!-- 支架安装的x坐标 -->
     <xacro:property name="support_y" value="0.0" /> <!-- 支架安装的y坐标 -->
-    <xacro:property name="support_z" value="${base_link_length / 2 + support_length / 2}" /> <!--
+    <xacro:property name="support_z" value="${base_wheel_link_length / 2 + support_length / 2}" /> <!--
     支架安装的z坐标:底盘高度 / 2 + 支架高度 / 2  -->
     <xacro:property name="support_m" value="0.02" /> <!-- 支架质量 -->
 
@@ -30,8 +30,8 @@
         <xacro:cylinder_inertial_matrix m="${support_m}" r="${support_radius}" h="${support_length}" />
     </link>
 
-    <joint name="support2base_link" type="fixed">
-        <parent link="base_link" />
+    <joint name="support2base_wheel_link" type="fixed">
+        <parent link="base_wheel_link" />
         <child link="support" />
         <origin xyz="${support_x} ${support_y} ${support_z}" />
     </joint>
