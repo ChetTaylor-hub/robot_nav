@@ -138,5 +138,15 @@
     <xacro:add_support_wheel name="front" flag="1" />
     <xacro:add_support_wheel name="back" flag="-1" />
 
+    <!-- 包含sunday机械臂 -->
+    <xacro:include filename="path/to/sunday.xacro" />
+
+    <!-- 设置base_link和sunday之间的连接 -->
+    <joint name="base_to_sunday" type="fixed">
+        <parent link="base_link" /> <!-- base_wheel的基链接 -->
+        <child link="base_footprint" /> <!-- sunday的基链接 -->
+        <origin xyz="0 0 ${base_link_length / 2}" rpy="0 0 0" /> <!-- 根据需要调整位置和姿态 -->
+    </joint>
+
 
 </robot>

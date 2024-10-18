@@ -49,7 +49,7 @@ class graspDemo:
         target_pose.pose.orientation.z = orientation[2]
         target_pose.pose.orientation.w = orientation[3]
         # 设置当前坐标为起始坐标
-        # self.arm.set_start_state_to_current_state()
+        self.arm.set_start_state_to_current_state()
         # 设置位置目标
         self.arm.set_pose_target(target_pose, self.end_effector_link)
         self.arm.go(wait=True)

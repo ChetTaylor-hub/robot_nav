@@ -15,14 +15,11 @@
     <!-- 加载slam_gampping -->
     <include file="$(find my_robot_navigation)/launch/slam_gmapping.launch" />
 
-    <!-- 加载main.py -->
-    <!-- <node pkg="my_robot_navigation" type="main.py" name="main" output="screen" /> -->
+    <!-- 加载robot_nav.py -->
+    <node pkg="my_robot_navigation" type="robot_nav.py" name="robot_nav" output="screen" />
 
     <!-- 加载yolov5_detector.launch -->
-    <include file="$(find my_robot_navigation)/launch/yolov5_detector.launch" />
-
-    <!-- 加载pixel_3D节点 -->
-    <!-- <node pkg="my_robot_navigation" type="pixel_3D.py" name="pixel_3D" output="screen" /> -->
+    <include file="$(find Yolov5_ros)/launch/yolo_v5.launch" />
 
     <!-- 在 gazebo 中显示机器人模型 -->
     <node pkg="gazebo_ros" type="spawn_model" name="model"

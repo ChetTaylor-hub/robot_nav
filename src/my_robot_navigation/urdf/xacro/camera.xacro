@@ -45,7 +45,7 @@
         <material>Gazebo/Blue</material>
     </gazebo>
 
-    <!-- <gazebo reference="kinect link名称"> -->
+    <!-- <gazebo reference="kinectic link名称"> -->
     <gazebo reference="camera">
         <sensor type="depth" name="camera">
             <always_on>true</always_on>
