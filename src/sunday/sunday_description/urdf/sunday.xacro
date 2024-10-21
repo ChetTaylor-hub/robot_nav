@@ -429,6 +429,19 @@ Stephen Brawner (brawner@gmail.com)
       xyz="0 0 0" />
   </joint> -->
 
+
+  <!-- include robot.xacro -->
+  <xacro:include filename="$(find my_robot_navigation)/urdf/robot.xacro" />
+
+  <!-- joint -->
+  <joint name="world2base_wheel_link" type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent link="world" />
+    <child link="base_wheel_link" />
+  </joint>
+
   <!-- Used for fixing robot to Gazebo 'base_link' -->
   <link name="world" />
 
