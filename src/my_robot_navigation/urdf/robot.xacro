@@ -2,7 +2,7 @@
 <robot name="robot" xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:include filename="xacro/inertial.xacro" />
   <xacro:include filename="xacro/base_wheel.xacro" />
-  <xacro:include filename="xacro/camera.xacro" />
+  <!-- <xacro:include filename="xacro/camera.xacro" /> -->
   <xacro:include filename="xacro/laser.xacro" />
   <xacro:include filename="xacro/move.xacro" />
 </robot>

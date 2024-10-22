@@ -9,7 +9,6 @@ from sensor_msgs.msg import Image, CameraInfo, LaserScan
 from std_msgs.msg import Float32MultiArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from cv_bridge import CvBridge, CvBridgeError
-from my_robot_navigation.msg import TargetWorldCoordinates
 from yolov5_ros_msgs.msg import BoundingBoxes
 
 mapExtent = {"width": 5, "height": 5}
@@ -53,7 +52,7 @@ class RobotNavigation:
         if not self.findObject:
             # 待抓取目标为空，则请求输入抓取目标
             if self.objectClass == '':
-                self.objectClass = input(f'object detected, please input the object you want to grasp:{objectClass}\n')
+                self.objectClass = input(f'object detected, please input the object you want to grasp:{self.objectClass}\n')
                 if self.objectClass not in self.objectClassList:
                     rospy.loginfo('The object you want to grasp is not support!!!')
                     self.objectClass = ''
@@ -210,7 +209,8 @@ if __name__ == '__main__':
     # 初始化ros节点
     rospy.init_node('robot_nav')
     # 实例化抓取导航类
-    robotnavigation = RobotNavigation()
+    robotnavigation = RobotNavigation("cube")
+    robotnavigation.run()
     # 实例化相机转换类
-    camera = DepthCameraCoordCovert('camera/depth/image_raw', '/camera/depth/camera_info')
+    # camera = DepthCameraCoordCovert('camera/depth/image_raw', '/camera/depth/camera_info')
     # TODO: 处理YOLOv5检测到的目标坐标，结合 RobotNavigation 和 DepthCameraCoordCovert 类实现机器人导航

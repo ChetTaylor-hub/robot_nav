@@ -41,7 +41,7 @@
             <commandTopic>cmd_vel</commandTopic> <!-- 运动控制话题 -->
             <odometryFrame>odom</odometryFrame>
             <odometryTopic>odom</odometryTopic> <!-- 里程计话题 -->
-            <robotBaseFrame>base_wheel_footprint</robotBaseFrame> <!-- 根坐标系 -->
+            <robotBaseFrame>world</robotBaseFrame> <!-- 根坐标系 -->
         </plugin>
     </gazebo>
 </robot>

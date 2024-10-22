@@ -13,6 +13,9 @@
     <include file="$(find sunday_moveit_config)/launch/moveit_planning_execution.launch">
     </include>
 
+    <!-- navagition launch file -->
+    <include file="$(find my_robot_navigation)/launch/gazebo_nav.launch" />
+
     <!-- yolo detect -->
     <include file="$(find yolov5_ros)/launch/yolo_v5.launch" />
     <!-- <include file="$(find yolov5_ros)/launch/yolo_v5_mouth.launch" /> -->

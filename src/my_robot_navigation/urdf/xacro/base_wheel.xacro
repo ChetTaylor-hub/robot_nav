@@ -9,10 +9,10 @@
     </material>
     <!-- 底盘属性 -->
     <xacro:property name="base_wheel_footprint_radius" value="0.001" /> <!-- base_wheel_footprint 半径  -->
-    <xacro:property name="base_wheel_link_radius" value="0.1" /> <!-- base_wheel_link 半径 -->
-    <xacro:property name="base_wheel_link_length" value="0.08" /> <!-- base_wheel_link 长 -->
-    <xacro:property name="earth_space" value="0.015" /> <!-- 离地间距 -->
-    <xacro:property name="base_wheel_link_m" value="0.5" /> <!-- 质量  -->
+    <xacro:property name="base_wheel_link_radius" value="0.3" /> <!-- base_wheel_link 半径 -->
+    <xacro:property name="base_wheel_link_length" value="0.3" /> <!-- base_wheel_link 长 -->
+    <xacro:property name="earth_space" value="0.15" /> <!-- 离地间距 -->
+    <xacro:property name="base_wheel_link_m" value="1.0" /> <!-- 质量  -->
 
     <!-- 底盘 -->
     <link name="base_wheel_footprint">
@@ -59,9 +59,9 @@
 
     <!-- 驱动轮 -->
     <!-- 驱动轮属性 -->
-    <xacro:property name="wheel_radius" value="0.0325" /> <!-- 半径 -->
-    <xacro:property name="wheel_length" value="0.015" /> <!-- 宽度 -->
-    <xacro:property name="wheel_m" value="0.05" /> <!-- 质量  -->
+    <xacro:property name="wheel_radius" value="0.1" /> <!-- 半径 -->
+    <xacro:property name="wheel_length" value="0.045" /> <!-- 宽度 -->
+    <xacro:property name="wheel_m" value="0.10" /> <!-- 质量  -->
 
     <!-- 驱动轮宏实现 -->
     <xacro:macro name="add_wheels" params="name flag">
@@ -137,17 +137,6 @@
 
     <xacro:add_support_wheel name="front" flag="1" />
     <xacro:add_support_wheel name="back" flag="-1" />
-
-    <!-- 包含sunday机械臂 -->
-    <xacro:include filename="$(find sunday_description)/urdf/sunday.xacro" />
-
-    <!-- 设置base_link和sunday之间的连接 -->
-    <joint name="base_to_sunday" type="fixed">
-        <parent link="base_wheel_link" /> <!-- base_wheel的基链接 -->
-        <child link="world" /> <!-- sunday的基链接 -->
-        <!-- TODO: 调整wheel和sunday的相对位置 -->
-        <origin xyz="0 0 ${base_wheel_link_length / 2}" rpy="0 0 0" /> <!-- 根据需要调整位置和姿态 -->
-    </joint>
 
 
 </robot>

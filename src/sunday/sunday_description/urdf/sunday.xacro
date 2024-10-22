@@ -8,6 +8,15 @@ Stephen Brawner (brawner@gmail.com)
 
   <link name="base_footprint">
   </link>
+  <!-- include robot.xacro -->
+  <xacro:include filename="$(find my_robot_navigation)/urdf/robot.xacro" />
+
+  <!-- joint -->
+  <joint name="world2base_wheel_footprint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_footprint" />
+    <child link="base_wheel_footprint" />
+  </joint>
 
   <link name="base_link">
     <inertial>
@@ -45,7 +54,9 @@ Stephen Brawner (brawner@gmail.com)
   <joint name="base_link2base_footprint" type="fixed">
     <parent link="base_footprint" />
     <child link="base_link" />
-    <origin xyz="0 0 0.032" rpy="0 0 0" />
+    <origin
+      xyz="${base_wheel_link_radius} ${base_wheel_link_radius / 2} ${base_wheel_link_length + earth_space + 0.032}"
+      rpy="0 0 0" />
   </joint>
 
 
@@ -430,15 +441,18 @@ Stephen Brawner (brawner@gmail.com)
   </joint> -->
 
   <!-- Used for fixing robot to Gazebo 'base_link' -->
+
+
   <link name="world" />
 
   <joint name="fixed" type="fixed">
     <origin
-      xyz="0 0 1.1"
+      xyz="0 1.1 0"
       rpy="0 0 0" />
     <parent link="world" />
     <child link="base_footprint" />
   </joint>
+
 
   <!-- <xacro:include filename="$(find sunday_description)/urdf/realsense/realsense.xacro"/> -->
   <xacro:include filename="$(find realsense_ros_gazebo)/xacro/depthcam.xacro" />

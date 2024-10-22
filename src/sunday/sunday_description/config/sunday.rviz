@@ -182,15 +182,12 @@ Visualization Manager:
                   link_3:
                     link_4:
                       link_5:
-                        link_6:
-                          {}
+                        link_6: {}
                         realsense:
                           cam_rgb_link:
                             camera_ir_link:
-                              camera_ir_optical_frame:
-                                {}
-                            camera_rgb_optical_frame:
-                              {}
+                              camera_ir_optical_frame: {}
+                            camera_rgb_optical_frame: {}
       Update Interval: 0
       Value: true
   Enabled: true
