@@ -29,7 +29,7 @@
         <param name="update_min_a" value="0.5" />
 
         <param name="odom_frame_id" value="odom" /> <!-- 里程计odom坐标系 -->
-        <param name="base_frame_id" value="base_footprint" /> <!-- 添加机器人基坐标系 -->
+        <param name="base_frame_id" value="base_car_footprint" /> <!-- 添加机器人基坐标系 -->
         <param name="global_frame_id" value="map" /> <!-- 添加地图map坐标系 -->
 
         <param name="resample_interval" value="1" />

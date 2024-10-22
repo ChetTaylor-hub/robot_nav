@@ -9,26 +9,34 @@ from sensor_msgs.msg import Image, CameraInfo, LaserScan
 from std_msgs.msg import Float32MultiArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from cv_bridge import CvBridge, CvBridgeError
-from my_robot_navigation.msg import TargetWorldCoordinates
 from yolov5_ros_msgs.msg import BoundingBoxes
 
 mapExtent = {"width": 5, "height": 5}
 
 class RobotNavigation:
-    def __init__(self):
-        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+    def __init__(self, cls: list):
+        # 坐标转换类
+        self.camera = DepthCameraCoordCovert('camera/depth/image_raw', '/camera/depth/camera_info')
+
+        # 雷达
         self.laser_sub = rospy.Subscriber('/scan', LaserScan, self.laser_callback)
-        self.target_sub = rospy.Subscriber('/yolov5/world_coordinates', BoundingBoxes, self.target_callback)
+        # TODO: 订阅YOLOv5检测到的目标坐标话题
+        self.target_sub = rospy.Subscriber('/yolov5/BoundingBoxes', BoundingBoxes, self.BoundingBoxCallBack)
         self.bridge = CvBridge()
+
+        # 移动底盘
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         self.move_base_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move_base_client.wait_for_server()
+
+        # tf变换，用于获取相机坐标系到世界坐标系的变换
         self.tf_listener = tf.TransformListener()
-        self.depth_sub = rospy.Subscriber('/camera/depth/image_raw', Image, self.depth_callback)
-        self.camera_info_sub = rospy.Subscriber('/camera/depth/camera_info', CameraInfo, self.camera_info_callback)
-        self.depth_image = None
-        self.camera_info = None
-        self.target_detected = False
+
+        self.findObject = False     # 是否找到目标
+        self.objectClass = ''       # 目标类别
+        self.objectClassList = cls  # 目标类别列表
         self.target_position = []
+        self.uv = []                # yolo检测到的目标中心坐标
 
     def laser_callback(self, data):
         # Check if there are obstacles within 0.5 meters in front of the robot
@@ -37,25 +45,37 @@ class RobotNavigation:
             self.obstacle_detected = True
         else:
             self.obstacle_detected = False
-
-    def depth_callback(self, msg):
-        try:
-            self.depth_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding="passthrough")
-        except CvBridgeError as e:
-            rospy.logerr("CvBridge Error: {0}".format(e))
-
     
-    def camera_info_callback(self, msg):
-        self.camera_info = msg
+    def BoundingBoxCallBack(self, data):
+        # yolo检测的回调函数
 
-    def target_callback(self, msg):
-        # 先将目标坐标存上
-        for box in msg.bounding_boxes:
-            x_center = (box.xmin + box.xmax) / 2
-            y_center = (box.ymin + box.ymax) / 2
-            cls = box.Class
-            self.target_position.append((x_center, y_center))
-            self.target_detected = True
+        if not self.findObject:
+            # 待抓取目标为空，则请求输入抓取目标
+            if self.objectClass == '':
+                self.objectClass = input(f'object detected, please input the object you want to grasp:{self.objectClass}\n')
+                if self.objectClass not in self.objectClassList:
+                    rospy.loginfo('The object you want to grasp is not support!!!')
+                    self.objectClass = ''
+                    return
+            object = []
+            for dat in data.bounding_boxes:
+                # 遍历所有目标，种类与待抓取目标相同则保存目标中心位置
+                if self.objectClass == dat.Class:
+                    object.append([dat.Class, (dat.xmin + dat.xmax)/2, (dat.ymin + dat.ymax)/2])
+            if object != []:
+                # 如果待抓取目标存在，则在目标列表随机选择一个返回
+                rospy.loginfo('{} found, begin grasp!!!'.format(self.objectClass))
+                _, u, v = random.choice(object)
+                self.uv = [int(u), int(v)]
+                self.findObject = True
+            else:
+                rospy.loginfo('The object you want to grasp is absent!!!')
+
+    def Pexels2World(self):
+        u, v = self.uv
+        # 图像坐标转换为世界坐标
+        worldFrame_pos = self.camera.Pixel2World(u, v)
+        return worldFrame_pos
 
     def move_to_target(self, position):
         goal = MoveBaseGoal()
@@ -82,14 +102,13 @@ class RobotNavigation:
         self.move_base_client.wait_for_result()
 
     def run(self):
-        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
-            if self.target_detected:
-                self.move_to_target(self.target_position)
-                self.target_detected = False
+            if self.findObject and self.camera.depth_ok:
+                # 图像坐标转换为世界坐标
+                worldFrame_pos = self.camera.Pixel2World(self.uv[0], self.uv[1])
+                self.move_to_target(worldFrame_pos)
             else:
                 self.random_walk()
-            rate.sleep()
 
 class DepthCameraCoordCovert():
     def __init__(self, depth_topic, camera_info_topic):
@@ -99,6 +118,7 @@ class DepthCameraCoordCovert():
         self.depth_image = None
         self.camera_info = None
         self.depth_ok = False
+        self.camera_info_ok = False
 
     def depthCallback(self, data):
         # 深度图像回调函数
@@ -107,15 +127,25 @@ class DepthCameraCoordCovert():
         self.depth_ok = True
 
     def camera_info_callback(self, msg):
+        # 相机内参回调函数
+        self.camera_info_ok = False
         self.camera_info = msg
+        self.camera_info_ok = True
         
     def get_CameraFrame_Pos(self, u, v, depthValue):
         # 图像系转相机系（u、v图像坐标，depthValue对应坐标的深度值）
-        # fx fy cx cy为相机内参
-        fx = 1043.99267578125
-        fy = 1043.99267578125
-        cx = 960
-        cy = 540
+
+        # # fx fy cx cy为相机内参
+        # fx = 1043.99267578125
+        # fy = 1043.99267578125
+        # cx = 960
+        # cy = 540
+
+        # HACK: 相机内参应该从相机信息中获取
+        fx = self.camera_info.K[0]
+        fy = self.camera_info.K[4]
+        cx = self.camera_info.K[2]
+        cy = self.camera_info.K[5]
 
         z = float(depthValue)
         x = float((u - cx) * z) / fx
@@ -177,9 +207,10 @@ class DepthCameraCoordCovert():
 
 if __name__ == '__main__':
     # 初始化ros节点
-    rospy.init_node('nav')
+    rospy.init_node('robot_nav')
     # 实例化抓取导航类
     robotnavigation = RobotNavigation("cube")
+    robotnavigation.run()
     # 实例化相机转换类
     # camera = DepthCameraCoordCovert('camera/depth/image_raw', '/camera/depth/camera_info')
     # TODO: 处理YOLOv5检测到的目标坐标，结合 RobotNavigation 和 DepthCameraCoordCovert 类实现机器人导航

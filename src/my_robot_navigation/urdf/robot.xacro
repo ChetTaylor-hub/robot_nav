@@ -2,7 +2,16 @@
 <robot name="robot" xmlns:xacro="http://wiki.ros.org/xacro">
   <xacro:include filename="xacro/inertial.xacro" />
   <xacro:include filename="xacro/base_wheel.xacro" />
-  <xacro:include filename="xacro/camera.xacro" />
+  <!-- <xacro:include filename="xacro/camera.xacro" /> -->
   <xacro:include filename="xacro/laser.xacro" />
   <xacro:include filename="xacro/move.xacro" />
+  <!-- sunday.xacro -->
+  <xacro:include filename="$(find sunday_description)/urdf/sunday.xacro" />
+  <joint name="sunday2base_car_link" type="fixed">
+    <parent link="base_car_link" />
+    <child link="base_footprint" />
+    <origin
+      xyz="${base_car_link_radius / 3} ${base_car_link_radius / 2} 0"
+      rpy="0 0 0" />
+  </joint>
 </robot>

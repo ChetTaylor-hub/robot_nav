@@ -430,15 +430,15 @@ Stephen Brawner (brawner@gmail.com)
   </joint> -->
 
   <!-- Used for fixing robot to Gazebo 'base_link' -->
-  <link name="world" />
+  <!-- <link name="world" />
 
   <joint name="fixed" type="fixed">
     <origin
-      xyz="0 0 1.1"
+      xyz="0 0 0"
       rpy="0 0 0" />
     <parent link="world" />
     <child link="base_footprint" />
-  </joint>
+  </joint> -->
 
   <!-- <xacro:include filename="$(find sunday_description)/urdf/realsense/realsense.xacro"/> -->
   <xacro:include filename="$(find realsense_ros_gazebo)/xacro/depthcam.xacro" />

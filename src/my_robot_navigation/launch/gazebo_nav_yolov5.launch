@@ -6,7 +6,7 @@
 
     <!-- 加载仿真环境 -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find my_robot_navigation)/worlds/test.world"></arg>
+        <arg name="world_name" value="$(find my_robot_navigation)/worlds/box_house.world"></arg>
     </include>
 
     <!-- 加载rviz.launch -->
@@ -19,7 +19,7 @@
     <!-- <node pkg="my_robot_navigation" type="main.py" name="main" output="screen" /> -->
 
     <!-- 加载yolov5_detector.launch -->
-    <include file="$(find my_robot_navigation)/launch/yolov5_detector.launch" />
+    <!-- <include file="$(find my_robot_navigation)/launch/yolov5_detector.launch" /> -->
 
     <!-- 加载pixel_3D节点 -->
     <!-- <node pkg="my_robot_navigation" type="pixel_3D.py" name="pixel_3D" output="screen" /> -->

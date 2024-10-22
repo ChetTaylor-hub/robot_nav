@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<robot name="simple_arm" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <!-- Define some constants -->
+    <xacro:property name="arm_length" value="1.0" />
+    <xacro:property name="arm_radius" value="0.05" />
+    <xacro:property name="gripper_length" value="0.2" />
+    <xacro:property name="gripper_radius" value="0.02" />
+    <xacro:property name="finger_length" value="0.1" />
+    <xacro:property name="finger_radius" value="0.01" />
+
+    <!-- Base link -->
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <cylinder length="0.1" radius="0.1" />
+            </geometry>
+            <material name="grey">
+                <color rgba="0.5 0.5 0.5 1.0" />
+            </material>
+        </visual>
+    </link>
+
+    <!-- Arm link -->
+    <link name="arm_link">
+        <visual>
+            <geometry>
+                <cylinder length="${arm_length}" radius="${arm_radius}" />
+            </geometry>
+            <material name="blue">
+                <color rgba="0.0 0.0 1.0 1.0" />
+            </material>
+        </visual>
+    </link>
+
+    <!-- Gripper link -->
+    <link name="gripper_link">
+        <visual>
+            <geometry>
+                <cylinder length="${gripper_length}" radius="${gripper_radius}" />
+            </geometry>
+            <material name="red">
+                <color rgba="1.0 0.0 0.0 1.0" />
+            </material>
+        </visual>
+    </link>
+
+    <!-- Finger links -->
+    <link name="left_finger">
+        <visual>
+            <geometry>
+                <cylinder length="${finger_length}" radius="${finger_radius}" />
+            </geometry>
+            <material name="green">
+                <color rgba="0.0 1.0 0.0 1.0" />
+            </material>
+        </visual>
+    </link>
+
+    <link name="right_finger">
+        <visual>
+            <geometry>
+                <cylinder length="${finger_length}" radius="${finger_radius}" />
+            </geometry>
+            <material name="green">
+                <color rgba="0.0 1.0 0.0 1.0" />
+            </material>
+        </visual>
+    </link>
+
+    <!-- Joints -->
+    <joint name="base_to_arm" type="revolute">
+        <parent link="base_link" />
+        <child link="arm_link" />
+        <origin xyz="0 0 0.05" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1.0" />
+    </joint>
+
+    <joint name="arm_to_gripper" type="revolute">
+        <parent link="arm_link" />
+        <child link="gripper_link" />
+        <origin xyz="0 0 ${arm_length/2}" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <limit lower="-1.57" upper="1.57" effort="10" velocity="1.0" />
+    </joint>
+
+    <joint name="gripper_to_left_finger" type="prismatic">
+        <parent link="gripper_link" />
+        <child link="left_finger" />
+        <origin xyz="0 ${gripper_radius} ${gripper_length/2}" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+        <limit lower="0" upper="${gripper_radius}" effort="10" velocity="1.0" />
+    </joint>
+
+    <joint name="gripper_to_right_finger" type="prismatic">
+        <parent link="gripper_link" />
+        <child link="right_finger" />
+        <origin xyz="0 -${gripper_radius} ${gripper_length/2}" rpy="0 0 0" />
+        <axis xyz="0 -1 0" />
+        <limit lower="0" upper="${gripper_radius}" effort="10" velocity="1.0" />
+    </joint>
+
+</robot>
