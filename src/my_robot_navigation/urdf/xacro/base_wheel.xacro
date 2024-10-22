@@ -14,15 +14,6 @@
     <xacro:property name="earth_space" value="0.15" /> <!-- 离地间距 -->
     <xacro:property name="base_wheel_link_m" value="1.0" /> <!-- 质量  -->
 
-    <!-- 底盘 -->
-    <link name="base_wheel_footprint">
-        <visual>
-            <geometry>
-                <sphere radius="${base_wheel_footprint_radius}" />
-            </geometry>
-        </visual>
-    </link>
-
     <link name="base_wheel_link">
         <visual>
             <geometry>
@@ -44,13 +35,6 @@
         <xacro:cylinder_inertial_matrix m="${base_wheel_link_m}" r="${base_wheel_link_radius}"
             h="${base_wheel_link_length}" />
     </link>
-
-
-    <joint name="base_wheel_link2base_wheel_footprint" type="fixed">
-        <parent link="base_wheel_footprint" />
-        <child link="base_wheel_link" />
-        <origin xyz="0 0 ${earth_space + base_wheel_link_length / 2 }" />
-    </joint>
 
     <gazebo reference="base_wheel_link">
         <!-- 与rviz不同（3）：重新设置颜色 -->
