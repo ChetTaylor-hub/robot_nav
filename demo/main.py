@@ -6,7 +6,7 @@ from utils.record import start_audio  # 从 record.py 导入录音函数
 from utils.translation import YouDaoTranslator, process_text  # 从 translation.py 导入翻译与文本处理模块
 import torch.nn as nn
 import numpy as np  
-from lstm import Model, vocab, pad_size, UNK, PAD, embedding_pretrained
+from utils.lstm import Model, vocab, pad_size, UNK, PAD, embedding_pretrained
 import time
 import websocket
 import datetime
@@ -19,6 +19,13 @@ from wsgiref.handlers import format_date_time
 from datetime import datetime
 from time import mktime
 import _thread as thread
+import warnings
+warnings.filterwarnings("ignore")
+
+# ROS相关库
+import rospy  # 新增
+from std_msgs.msg import String  # 新增
+
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
@@ -206,6 +213,10 @@ def process_sentence(sentence, vocab, pad_size, PAD_id, UNK_id):
 # 主函数
 ###################################################################
 if __name__ == "__main__":
+    # ROS节点初始化
+    rospy.init_node('speech_recognition_node', anonymous=True)  # 新增，用于初始化ROS节点
+    pub = rospy.Publisher('/speech_recognition/result', String, queue_size=10)  # 新增，创建发布者，用于发布识别结果
+
     # 1. 录音
     start_audio(record_time, save_mp3=AUDIO_FILE)
 
@@ -256,3 +267,6 @@ if __name__ == "__main__":
 
     predicted_label = label_map[prediction[0]]
     print(f"Predicted label for '{processed_text}' is: {predicted_label}")
+    # 发布识别结果到ROS
+    pub.publish(predicted_label)  # 新增，发布预测的标签
+    rospy.loginfo(f"发布识别结果: {predicted_label}")  # 新增，日志记录发布的结果
