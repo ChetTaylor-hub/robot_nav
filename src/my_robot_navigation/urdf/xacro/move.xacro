@@ -22,26 +22,12 @@
 
     <!-- 控制器 -->
     <gazebo>
-        <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
-            <rosDebugLevel>Debug</rosDebugLevel>
-            <publishWheelTF>false</publishWheelTF>
-            <robotNamespace>/car</robotNamespace>
-            <publishTf>1</publishTf>
-            <publishWheelJointState>true</publishWheelJointState>
-            <alwaysOn>true</alwaysOn>
-            <updateRate>100.0</updateRate>
-            <legacyMode>true</legacyMode>
-            <leftJoint>left_wheel2base_car_link</leftJoint> <!-- 左轮 -->
-            <rightJoint>right_wheel2base_car_link</rightJoint> <!-- 右轮 -->
-            <wheelSeparation>${base_car_link_radius * 2}</wheelSeparation> <!-- 车轮间距 -->
-            <wheelDiameter>${wheel_radius * 2}</wheelDiameter> <!-- 车轮直径 -->
-            <broadcastTF>1</broadcastTF>
-            <wheelTorque>300</wheelTorque>
-            <wheelAcceleration>10.8</wheelAcceleration>
-            <commandTopic>cmd_vel</commandTopic> <!-- 运动控制话题 -->
+        <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+            <commandTopic>cmd_vel</commandTopic>
+            <odometryTopic>odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
-            <odometryTopic>odom</odometryTopic> <!-- 里程计话题 -->
-            <robotBaseFrame>base_car_footprint</robotBaseFrame> <!-- 根坐标系 -->
+            <odometryRate>20.0</odometryRate>
+            <robotBaseFrame>base_car_footprint</robotBaseFrame>
         </plugin>
     </gazebo>
 </robot>
