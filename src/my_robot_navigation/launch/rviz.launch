@@ -4,10 +4,10 @@
         args="-d $(find my_robot_navigation)/rviz/robot.rviz" />
 
     <!-- 关节以及机器人状态发布节点 -->
-    <node name="joint_state_publisher"
+    <!-- <node name="joint_state_publisher"
         pkg="joint_state_publisher" type="joint_state_publisher" />
     <node
-        name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+        name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
 
     <!-- 启动move.launch -->
     <include file="$(find my_robot_navigation)/launch/move.launch" />

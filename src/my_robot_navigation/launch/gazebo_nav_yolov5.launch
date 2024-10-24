@@ -18,11 +18,15 @@
     <!-- 加载main.py -->
     <!-- <node pkg="my_robot_navigation" type="main.py" name="main" output="screen" /> -->
 
-    <!-- 加载yolov5_detector.launch -->
-    <!-- <include file="$(find my_robot_navigation)/launch/yolov5_detector.launch" /> -->
+    <!-- ros_control arm launch file -->
+    <include file="$(find sunday_gazebo)/launch/sunday_gazebo_states.launch" />
 
-    <!-- 加载pixel_3D节点 -->
-    <!-- <node pkg="my_robot_navigation" type="pixel_3D.py" name="pixel_3D" output="screen" /> -->
+    <!-- ros_control trajectory control dof arm launch file -->
+    <include file="$(find sunday_gazebo)/launch/sunday_trajectory_controller.launch" />
+
+    <!-- moveit launch file -->
+    <include file="$(find sunday_moveit_config)/launch/moveit_planning_execution.launch">
+    </include>
 
     <!-- 在 gazebo 中显示机器人模型 -->
     <node pkg="gazebo_ros" type="spawn_model" name="model"

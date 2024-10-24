@@ -11,7 +11,7 @@
     <parent link="base_car_link" />
     <child link="base_footprint" />
     <origin
-      xyz="${base_car_link_radius / 3} ${base_car_link_radius / 2} 0"
+      xyz="${base_car_link_radius / 3} ${base_car_link_radius / 2} -0.032"
       rpy="0 0 0" />
   </joint>
 </robot>
