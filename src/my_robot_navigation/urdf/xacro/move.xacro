@@ -26,8 +26,8 @@
             <commandTopic>cmd_vel</commandTopic>
             <odometryTopic>odom</odometryTopic>
             <odometryFrame>odom</odometryFrame>
-            <odometryRate>20.0</odometryRate>
-            <robotBaseFrame>base_car_footprint</robotBaseFrame>
+            <odometryTopic>odom</odometryTopic> <!-- 里程计话题 -->
+            <robotBaseFrame>base_car_footprint</robotBaseFrame> <!-- 根坐标系 -->
         </plugin>
     </gazebo>
 </robot>
