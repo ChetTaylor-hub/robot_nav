@@ -10,8 +10,4 @@
         <rosparam file="$(find my_robot_navigation)/param/base_local_planner_params.yaml"
             command="load" />
     </node>
-    <!-- 启动控制器管理器 -->
-    <node name="car_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-        output="screen" ns="/car"
-        args="joint_state_controller diff_drive_controller arm_controller" />
 </launch>
