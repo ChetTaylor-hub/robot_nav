@@ -1,6 +1,6 @@
 <launch>
     <!-- Launch Gazebo with a specific world file -->
-    <arg name="world_file" default="$(find my_robot_navigation)/worlds/box_house.world" />
+    <arg name="world_file" default="$(find my_robot_navigation)/worlds/test.world" />
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(arg world_file)" />

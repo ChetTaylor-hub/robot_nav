@@ -7,6 +7,7 @@ import rospy
 import tf
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image
+from std_msgs.msg import Bool, String
 import numpy as np
 import sys
 import moveit_commander
@@ -223,24 +224,29 @@ def BoundingBoxCallBack(data):
 
     if not findObject:
         # 待抓取目标为空，则请求输入抓取目标
-        if graspObject == '':
-            graspObject = input(f'object detected, please input the object you want to grasp:{objectClass}\n')
-            if graspObject not in objectClass:
-                rospy.loginfo('The object you want to grasp is not support!!!')
-                graspObject = ''
-                return
-        objectGrasp = []
-        for dat in data.bounding_boxes:
-            # 遍历所有目标，种类与待抓取目标相同则保存目标中心位置
-            if graspObject == dat.Class:
-                objectGrasp.append([dat.Class, (dat.xmin + dat.xmax)/2, (dat.ymin + dat.ymax)/2])
-        if objectGrasp != []:
-            # 如果待抓取目标存在，则在目标列表随机选择一个返回
-            rospy.loginfo('{} found, begin grasp!!!'.format(graspObject))
-            _, u, v = random.choice(objectGrasp)
-            findObject = True
-        else:
-            rospy.loginfo('The object you want to grasp is absent!!!')
+        if graspObject:
+            objectGrasp = []
+            for dat in data.bounding_boxes:
+                # 遍历所有目标，种类与待抓取目标相同则保存目标中心位置
+                if graspObject == dat.Class:
+                    objectGrasp.append([dat.Class, (dat.xmin + dat.xmax)/2, (dat.ymin + dat.ymax)/2])
+            if objectGrasp != []:
+                # 如果待抓取目标存在，则在目标列表随机选择一个返回
+                rospy.loginfo('{} found, begin grasp!!!'.format(graspObject))
+                _, u, v = random.choice(objectGrasp)
+                findObject = True
+    
+def targetCallback(data):
+    # 小车到达目标点回调函数
+    global targetComplete, startComplete, graspObject
+    if data.data.split("&")[0] == 'target':
+        graspObject = data.data.split("&")[-1]
+        targetComplete = True
+        startComplete = False
+    elif data.data == 'start':
+        startComplete = True
+        targetComplete = False
+
 
 def depthCallback(data):
     # 深度图像回调函数
@@ -265,6 +271,8 @@ if __name__ == "__main__":
     # 深度图像和检测框对应topic名称
     depth_topic = 'camera/depth/image_raw'
     BoundingBox_topic = '/yolov5/BoundingBoxes'
+    # 抓取完成话题
+    graspComplete_topic = '/sunday/grasp_complete'
     # 初始化ros节点
     rospy.init_node('grasp')
     # 实例化抓取控制类
@@ -275,35 +283,50 @@ if __name__ == "__main__":
     u = 960
     v = 540
     graspObject = ''
+    targetComplete = False
+    startComplete = False
     # 订阅深度图像和检测框对应topic
     rospy.Subscriber(BoundingBox_topic, BoundingBoxes, BoundingBoxCallBack, queue_size=1) 
     rospy.Subscriber(depth_topic, Image, depthCallback, queue_size=1) 
+    # 发布抓取完成话题
+    graspComplete_pub = rospy.Publisher(graspComplete_topic, Bool, queue_size=1)
+    # 订阅小车到达目标点话题
+    rospy.Subscriber('/car/targetComplete', String, targetCallback)
 
     while not rospy.is_shutdown():
-        # 如果检测到待抓取物体且获取到了深度图
-        if findObject and depthOK:
-            # 获取相机系到世界系的旋转平移矩阵
-            [R, T] = get_RT_matrix('world','camera_color_optical_frame')
-            u, v = int(u), int(v) # 防止检测的坐标越界
-            # 图像坐标转相机系坐标
-            cameraFrame_pos = get_CameraFrame_Pos(u, v, depthImg[v,u]/1000.0)
-            # 相机系坐标转世界系坐标
-            worldFrame_pos = coordinate_transform(cameraFrame_pos, R, T)
-            print(graspObject + ' pose is: ', worldFrame_pos)
-            
-            # 移动到抓取物体的上方
-            grasp_demo.move([worldFrame_pos[0], worldFrame_pos[1], worldFrame_pos[2]+0.015],endDown)
-            # 开启吸盘
-            grasp_demo.vacuumOn()
-            rospy.sleep(0.5) # wait for grasp
-            # 向上移动仿真防止直接移动吸到其他物体
-            grasp_demo.move_cartesian_byNow(0, 0 , -0.1) # avoid grasp other object by mistake
-            # 移动到放置位置
-            grasp_demo.move([worldFrame_pos[0], worldFrame_pos[1], worldFrame_pos[2]+0.015],endDown)
-            # 关闭吸盘
-            grasp_demo.vacuumOff()
-            # 回到检测的位置
-            grasp_demo.go_named('scan_food')            
-            # 重置参数
-            findObject = False
-            graspObject = ''
+        if targetComplete:
+            # 如果检测到待抓取物体且获取到了深度图
+            if findObject and depthOK:
+                # 获取相机系到世界系的旋转平移矩阵
+                [R, T] = get_RT_matrix('world','camera_color_optical_frame')
+                u, v = int(u), int(v) # 防止检测的坐标越界
+                # 图像坐标转相机系坐标
+                cameraFrame_pos = get_CameraFrame_Pos(u, v, depthImg[v,u]/1000.0)
+                # 相机系坐标转世界系坐标
+                worldFrame_pos = coordinate_transform(cameraFrame_pos, R, T)
+                print(graspObject + ' pose is: ', worldFrame_pos)
+                
+                # 移动到抓取物体的上方
+                grasp_demo.move([worldFrame_pos[0], worldFrame_pos[1], worldFrame_pos[2]+0.015],endDown)
+                # 开启吸盘
+                grasp_demo.vacuumOn()
+                rospy.sleep(0.5) # wait for grasp
+                # 向上移动仿真防止直接移动吸到其他物体
+                grasp_demo.move_cartesian_byNow(0, 0 , -0.1) # avoid grasp other object by mistake
+                # 移动到放置位置
+                grasp_demo.move([worldFrame_pos[0], worldFrame_pos[1], worldFrame_pos[2]+0.015],endDown)
+                grasp_demo.go_named('scan_food') # back to scan food
+                # 发布抓取完成话题
+                graspComplete_pub.publish(True)
+                # 重置参数
+                targetComplete = False
+
+            elif startComplete:
+                # 关闭吸盘
+                grasp_demo.vacuumOff()
+                # 回到检测的位置
+                grasp_demo.go_named('scan_food')            
+                # 重置参数
+                findObject = False
+                graspObject = ''
+                startComplete = False

@@ -28,6 +28,9 @@
     <include file="$(find sunday_moveit_config)/launch/moveit_planning_execution.launch">
     </include>
 
+    <!-- 加载 grasp.py -->
+    <!-- <node pkg="sunday_gazebo" type="grasp.py" name="grasp" output="screen" /> -->
+
     <!-- 在 gazebo 中显示机器人模型 -->
     <node pkg="gazebo_ros" type="spawn_model" name="model"
         args="-urdf -model mycar -param robot_description" />

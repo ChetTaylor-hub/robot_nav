@@ -12,9 +12,9 @@
     <xacro:property name="base_car_footprint_radius" value="${scale * 0.001}" /> <!--
     base_car_footprint 半径  -->
     <xacro:property name="base_car_link_radius" value="${scale * 0.1}" /> <!-- base_car_link 半径 -->
-    <xacro:property name="base_car_link_length" value="${scale * 0.08}" /> <!-- base_car_link 长 -->
+    <xacro:property name="base_car_link_length" value="${scale * 0.03}" /> <!-- base_car_link 长 -->
     <xacro:property name="earth_space" value="${scale * 0.015}" /> <!-- 离地间距 -->
-    <xacro:property name="base_car_link_m" value="${scale * 0.5}" /> <!-- 质量  -->
+    <xacro:property name="base_car_link_m" value="${scale *1}" /> <!-- 质量  -->
 
     <!-- 底盘 -->
     <link name="base_car_footprint">

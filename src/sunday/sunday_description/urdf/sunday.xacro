@@ -14,7 +14,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="-0.0041595 -0.019776 0.12"
         rpy="0 0 0" />
-      <mass value="0.524001417146026" />
+      <mass value="0.0524001417146026" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
@@ -45,7 +45,7 @@ Stephen Brawner (brawner@gmail.com)
   <joint name="base_link2base_footprint" type="fixed">
     <parent link="base_footprint" />
     <child link="base_link" />
-    <origin xyz="0 0 0.032" rpy="0 0 0" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
   </joint>
 
 
@@ -54,7 +54,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="4.4076E-07 0.0088489 0.03981"
         rpy="0 0 0" />
-      <mass value="0.166259789544396" />
+      <mass value="0.0166259789544396" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
@@ -109,7 +109,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="5.2117E-07 0.050183 0.046384"
         rpy="0 0 0" />
-      <mass value="0.316094041078938" />
+      <mass value="0.0316094041078938" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
@@ -162,7 +162,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="-2.3744E-06 0.013658 -0.095655"
         rpy="0 0 0" />
-      <mass value="0.323135746651779" />
+      <mass value="0.0323135746651779" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
@@ -215,7 +215,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="-6.4344E-06 -0.026419 -0.014391"
         rpy="0 0 0" />
-      <mass value="0.174947986817189" />
+      <mass value="0.0174947986817189" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
@@ -268,7 +268,7 @@ Stephen Brawner (brawner@gmail.com)
       <origin
         xyz="0.00020466 -0.017155 -0.036587"
         rpy="0 0 0" />
-      <mass value="0.174947985033356" />
+      <mass value="0.0174947985033356" />
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
     <visual>
